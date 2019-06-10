@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Frieds App</title>
+    <link  rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+    <main class="friends">
+        <div class="friends-zone"></div>
+        <div class="friends-search">
+            <div class="friends-search-header"> 
+                <div class="search-wrap-icon">
+                    <span>Search options</span>
+                </div>
+            </div>
+            <div class="search-wrap-options">
+                <div>
+                    <label class="search-label-options" for="sort-select">Sort by:</label>
+                    <select id="sort-select" class="search-input-options input-height">
+                        <option value="0">-</option>
+                        <option value="1">name from A to Z</option>
+                        <option value="2">name from Z to A</option>
+                        <option value="3">age from Min to Max</option>
+                        <option value="4">age from Max to Min</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="search-label-options" for="sort-name">By name:</label>
+                    <input id="sort-name" type="text" class="search-input-options">
+                </div>
+                <div>
+                    <label class="search-label-options" for="">By age:</label>
+                    <input type="text" class="search-input-age age1">
+                    <span> - </span>
+                    <input type="text" class="search-input-age age2">
+                </div>
+                <div>
+                    <label class="search-label-options" for="">By sex:</label>
+                    <div>
+                        <input type="radio" id="male" name="sex">
+                        <label for="male">Male</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="female" name="sex">
+                        <label for="female">Female</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="all" name="sex">
+                        <label for="all">All</label>
+                    </div>
+                </div>
+                <button class="search-input-options input-height search-button">Find</button>
+            </div>
+        </div>
+    </main>
+<script src="./js/app.js"></script>
+</body>
+</html>
