@@ -2,17 +2,31 @@ const allFriends = {
     friends: []
 };
 
-const getDataApi = () => {
-    return fetch('https://randomuser.me/api/?results=100').then((response) => {
-        return response.json();
-      }).then((data) => {
-        allFriends.friends = data.results;
-        changePage(1);
-      });
-}
+const filters = document.querySelector(".filters");
+const searchByName = document.querySelector(".");
+const searchBygender = document.querySelector(".");
+const searchByAge1 = document.querySelector(".");
+const searchByAge2 = document.querySelector(".");
 
+
+const getDataApi = async () => {
+    const response = await fetch('https://randomuser.me/api/?results=20');
+    const data = await response.json();
+    allFriends.friends = data.results;
+    // renderFriendsList(allFriends.friends);
+    // console.log(sortByMinAge(allFriends.friends))
+    // console.log(sortByMaxAge(allFriends.friends))
+    // console.log(sortByAscName(allFriends.friends))
+    // console.log(sortByDescName(allFriends.friends))
+    // console.log(filterByGender(allFriends.friends, "female"))
+    // console.log(filterByAge(allFriends.friends, 20, 30));
+    console.log(searchByName(allFriends.friends, "ma"));
+}
+    
+const capitalFirstLet = (word) => word.charAt(0).toUpperCase() + word.slice(1);            
 
 const drawFriendsCards = (user) => {
+    // console.log(user);
     let temp = `<div class="user-card shadow-profile">
         <div class="user-card__img"><img class="" src="${user.picture.large}"></div>
         <div>
@@ -32,62 +46,24 @@ const drawFriendsCards = (user) => {
     document.querySelector(".friends-zone").insertAdjacentHTML("beforeEnd", temp);
 }
 
-const capitalFirstLet = (word) => word.charAt(0).toUpperCase() + word.slice(1);
-
-let current_page = 1;
-let records_per_page = 16;
-
-
-function prevPage()
-{
-    if (current_page > 1) {
-        current_page--;
-        changePage(current_page);
+const renderFriendsList = (object) => {
+    for (const iterator of object) {
+        drawFriendsCards(iterator);
     }
 }
+const sortByMinAge = (arr) => arr.sort((a, b) => a.dob.age - b.dob.age);
 
-function nextPage()
-{
-    if (current_page < numPages()) {
-        current_page++;
-        changePage(current_page);
-    }
-}
-    
-function changePage(page)
-{
-    let btn_next = document.getElementById("btn_next");
-    let btn_prev = document.getElementById("btn_prev");
-    let listing_table = document.getElementById("listingTable");
-    let page_span = document.getElementById("page");
- 
-    // Validate page
-    if (page < 1) page = 1;
-    if (page > numPages()) page = numPages();
+const sortByMaxAge = (arr) => arr.sort((a, b) => b.dob.age - a.dob.age);
 
-    listing_table.innerHTML = "";
-    for (let i = (page-1) * records_per_page; i < (page * records_per_page); i++) {
-        drawFriendsCards(allFriends.friends[i]);
-    }
-    page_span.innerHTML = page;
+const sortByAscName = (arr) => arr.sort((a, b) => a.name.first < b.name.first ? -1 : 1);
 
-    if (page == 1) {
-        btn_prev.style.visibility = "hidden";
-    } else {
-        btn_prev.style.visibility = "visible";
-    }
+const sortByDescName = (arr) => arr.sort((a, b) => a.name.first > b.name.first ? -1 : 1);
 
-    if (page == numPages()) {
-        btn_next.style.visibility = "hidden";
-    } else {
-        btn_next.style.visibility = "visible";
-    }
-}
+const filterByGender = (arr, gender) => arr.filter((arr) => arr.gender === gender);
 
-function numPages()
-{
-    return Math.ceil(allFriends.friends.length / records_per_page);
-}
+const filterByAge = (arr, age1, age2) => arr.filter((arr) => age1 <= arr.dob.age && arr.dob.age <= age2);
+
+const searchByName = (arr, searchText) => arr.filter((arr) => new RegExp(searchText, 'i').test(arr.name.first));
 
 window.onload = function() {
     getDataApi()
