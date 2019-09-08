@@ -2,11 +2,11 @@ const allFriends = {
     friends: []
 };
 
-const filters = document.querySelector(".filters");
-const searchByName = document.querySelector(".");
-const searchBygender = document.querySelector(".");
-const searchByAge1 = document.querySelector(".");
-const searchByAge2 = document.querySelector(".");
+const filters = document.querySelector(".filters-input");
+const searchByNameUser = document.querySelector(".search-input-name");
+const searchBygender = document.querySelector(".search-input-gender");
+const searchByAge1 = document.querySelector(".search-input-age1");
+const searchByAge2 = document.querySelector(".search-input-age2");
 
 
 const getDataApi = async () => {
@@ -64,6 +64,11 @@ const filterByGender = (arr, gender) => arr.filter((arr) => arr.gender === gende
 const filterByAge = (arr, age1, age2) => arr.filter((arr) => age1 <= arr.dob.age && arr.dob.age <= age2);
 
 const searchByName = (arr, searchText) => arr.filter((arr) => new RegExp(searchText, 'i').test(arr.name.first));
+
+
+filters.addEventListener("click", (e) => {
+    console.log(e.target);
+})
 
 window.onload = function() {
     getDataApi()

@@ -9,12 +9,12 @@
 </head>
 <body>
     <main class="friends">
-        <div>
+        <!-- <div>
             <div id="listingTable" class="friends-zone"></div>
             <a href="javascript:prevPage()" id="btn_prev">Prev</a>
             <a href="javascript:nextPage()" id="btn_next">Next</a>
             page: <span id="page"></span>
-        </div>
+        </div> -->
         <div class="friends-search">
             <div class="friends-search-header"> 
                 <div class="search-wrap-icon">
@@ -24,7 +24,7 @@
             <div class="search-wrap-options">
                 <div>
                     <label class="search-label-options" for="sort-select">Sort by:</label>
-                    <select id="sort-select" class="search-input-options input-height filters">
+                    <select id="sort-select" class="search-input-options input-height filters-input">
                         <option value="0">-</option>
                         <option value="1">name from A to Z</option>
                         <option value="2">name from Z to A</option>
@@ -34,30 +34,30 @@
                 </div>
                 <div>
                     <label class="search-label-options" for="sort-name">By name:</label>
-                    <input id="sort-name" type="text" class="search-input-options">
+                    <input id="sort-name" type="text" class="search-input-options search-input-name">
                 </div>
                 <div>
                     <label class="search-label-options" for="">By age:</label>
-                    <input type="text" class="search-input-age age1">
+                    <input type="text" class="search-input-age search-input-age1">
                     <span> - </span>
-                    <input type="text" class="search-input-age age2">
+                    <input type="text" class="search-input-age search-input-age2">
                 </div>
                 <div>
-                    <label class="search-label-options" for="">By sex:</label>
+                    <label class="search-label-options" for="">By gender:</label>
                     <div>
-                        <input type="radio" id="male" name="sex">
+                        <input type="radio" id="male" value="male" name="search-input-gender">
                         <label for="male">Male</label>
                     </div>
                     <div>
-                        <input type="radio" id="female" name="sex">
+                        <input type="radio" id="female " value="female" name="search-input-gender">
                         <label for="female">Female</label>
                     </div>
                     <div>
-                        <input type="radio" id="all" name="sex">
+                        <input type="radio" id="all" value="all" name="search-input-gender">
                         <label for="all">All</label>
                     </div>
                 </div>
-                <button class="search-input-options input-height search-button">Find</button>
+                <button class="search-input-options input-height reset-button">Reset</button>
             </div>
         </div>
     </main>
