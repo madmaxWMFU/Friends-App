@@ -1,56 +1,43 @@
 const allFriends = {
-    friends: []
+    currentList: [],
+    changeList: []
 };
 
 const filters = document.querySelector(".filters-input");
 const searchByNameUser = document.querySelector(".search-input-name");
-const searchBygender = document.querySelector(".search-input-gender");
+const searchByGender = document.querySelector(".search-options__gender");
 const searchByAge1 = document.querySelector(".search-input-age1");
 const searchByAge2 = document.querySelector(".search-input-age2");
-
+const searchByAge = document.querySelector(".search-options__age");
+const friendZone = document.querySelector(".friends-zone");
+const resetFilters = document.querySelector(".reset-button");
 
 const getDataApi = async () => {
     const response = await fetch('https://randomuser.me/api/?results=20');
     const data = await response.json();
-    allFriends.friends = data.results;
-    // renderFriendsList(allFriends.friends);
-    // console.log(sortByMinAge(allFriends.friends))
-    // console.log(sortByMaxAge(allFriends.friends))
-    // console.log(sortByAscName(allFriends.friends))
-    // console.log(sortByDescName(allFriends.friends))
-    // console.log(filterByGender(allFriends.friends, "female"))
-    // console.log(filterByAge(allFriends.friends, 20, 30));
-    console.log(searchByName(allFriends.friends, "ma"));
-}
-    
-const capitalFirstLet = (word) => word.charAt(0).toUpperCase() + word.slice(1);            
+    allFriends.currentList = data.results;
+    renderFriendsList(allFriends.currentList);
+}      
 
 const drawFriendsCards = (user) => {
-    // console.log(user);
     let temp = `<div class="user-card shadow-profile">
-        <div class="user-card__img"><img class="" src="${user.picture.large}"></div>
-        <div>
-            <div class="user-card__cnt">
-                <div class="profile-card__name"><span>${capitalFirstLet(user.name.first)}</span></div>
-                <div class="profile-card__name"><span>${capitalFirstLet(user.name.last)}</span></div>
-                <div class="profile-card__name"><span>${capitalFirstLet(user.location.city)}, ${user.nat}</span></div>
-            </div>
-            <div class="profile-card__txt">
-                <div><span>Place: ${capitalFirstLet(user.location.street)}</span></div>
-                <div><span>E-mail: ${user.email}</span></div>
-                <div><span>Phones: ${user.phone}/
-                ${user.cell}</span></div>
-            </div>
-        </div> 
-    </div>`;
-    document.querySelector(".friends-zone").insertAdjacentHTML("beforeEnd", temp);
+                    <div class="user-card__img"><img class="" src="${user.picture.large}"></div>
+                        <div class="user-card__cnt">
+                            <div class="profile-card__name"><span>${user.name.first}</span></div>
+                            <div class="profile-card__name"><span>${user.name.last}</span></div>
+                            <div class="profile-card__name"><span>${user.location.city}, ${user.nat}</span></div>
+                            <div class="profile-card__name"><address>Place: ${user.location.street.name}, ${user.location.street.number}</address></div>
+                        </div> 
+                    <span class="user-card__age">${user.dob.age}</span>
+                </div>`;
+    friendZone.insertAdjacentHTML("beforeEnd", temp);
 }
 
-const renderFriendsList = (object) => {
-    for (const iterator of object) {
-        drawFriendsCards(iterator);
-    }
+const renderFriendsList = (allFriends) => {
+    friendZone.innerHTML = "";
+    allFriends.forEach(friend => drawFriendsCards(friend));
 }
+
 const sortByMinAge = (arr) => arr.sort((a, b) => a.dob.age - b.dob.age);
 
 const sortByMaxAge = (arr) => arr.sort((a, b) => b.dob.age - a.dob.age);
@@ -65,11 +52,37 @@ const filterByAge = (arr, age1, age2) => arr.filter((arr) => age1 <= arr.dob.age
 
 const searchByName = (arr, searchText) => arr.filter((arr) => new RegExp(searchText, 'i').test(arr.name.first));
 
+resetFilters.addEventListener("click", () => renderFriendsList(allFriends.currentList));
 
-filters.addEventListener("click", (e) => {
-    console.log(e.target);
+document.querySelector(".search-wrap-options").addEventListener("change", (e) => {
+    allFriends.changeList = [...allFriends.currentList];
+    switch(e.target.name) {
+        case "search-input-options":
+            if(e.target.value === "nameAsc") allFriends.changeList = sortByAscName(allFriends.changeList);
+            if(e.target.value === "nameDesc") allFriends.changeList = sortByDescName(allFriends.changeList);
+            if(e.target.value === "ageAsc") allFriends.changeList = sortByMinAge(allFriends.changeList);
+            if(e.target.value === "ageDesc") allFriends.changeList = sortByMaxAge(allFriends.changeList);
+            renderFriendsList(allFriends.changeList);
+            break;
+        case "search-input-name":
+            allFriends.changeList = searchByName(allFriends.changeList, e.target.value);
+            renderFriendsList(allFriends.changeList);
+            break;
+        case "search-input-age":
+            allFriends.changeList = filterByAge(allFriends.changeList, searchByAge1.value, searchByAge2.value);
+            renderFriendsList(allFriends.changeList);
+            break;
+        case "search-input-gender":
+            if(e.target.value.toLowerCase().indexOf("male") !== -1) {
+                allFriends.changeList = filterByGender(allFriends.changeList, e.target.value);
+                renderFriendsList(allFriends.changeList);
+            } else {
+                renderFriendsList(allFriends.currentList);
+            }
+            break;
+    }
 })
 
 window.onload = function() {
     getDataApi()
-};
+}
