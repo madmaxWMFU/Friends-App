@@ -1,6 +1,9 @@
 const allFriends = {
     currentList: [],
-    changeList: []
+    changeList: [],
+    countFriends: 52,
+    minAge: 0,
+    maxAge: 150
 };
 
 const filters = document.querySelector(".filters-input");
@@ -13,7 +16,7 @@ const friendZone = document.querySelector(".friends-zone");
 const resetFilters = document.querySelector(".reset-button");
 
 const getDataApi = async () => {
-    const response = await fetch('https://randomuser.me/api/?results=20');
+    const response = await fetch(`https://randomuser.me/api/?results=${allFriends.countFriends}`);
     const data = await response.json();
     allFriends.currentList = data.results;
     renderFriendsList(allFriends.currentList);
@@ -52,30 +55,37 @@ const filterByAge = (arr, age1, age2) => arr.filter((arr) => age1 <= arr.dob.age
 
 const searchByName = (arr, searchText) => arr.filter((arr) => new RegExp(searchText, 'i').test(arr.name.first));
 
-resetFilters.addEventListener("click", () => renderFriendsList(allFriends.currentList));
+resetFilters.addEventListener("click", () => {
+    searchByNameUser.value = "";
+    filters.options[0].selected = true;
+    searchByAge1.value = allFriends.minAge;
+    searchByAge2.value = allFriends.maxAge;
+    document.querySelector("[name='search-input-gender']:checked").checked = false;
+    renderFriendsList(allFriends.currentList);
+});
 
 document.querySelector(".search-wrap-options").addEventListener("change", (e) => {
-    allFriends.changeList = [...allFriends.currentList];
+    changeList = [...allFriends.currentList];
     switch(e.target.name) {
         case "search-input-options":
-            if(e.target.value === "nameAsc") allFriends.changeList = sortByAscName(allFriends.changeList);
-            if(e.target.value === "nameDesc") allFriends.changeList = sortByDescName(allFriends.changeList);
-            if(e.target.value === "ageAsc") allFriends.changeList = sortByMinAge(allFriends.changeList);
-            if(e.target.value === "ageDesc") allFriends.changeList = sortByMaxAge(allFriends.changeList);
-            renderFriendsList(allFriends.changeList);
+            if(e.target.value === "nameAsc") changeList = sortByAscName(changeList);
+            if(e.target.value === "nameDesc") changeList = sortByDescName(changeList);
+            if(e.target.value === "ageAsc") changeList = sortByMinAge(changeList);
+            if(e.target.value === "ageDesc") changeList = sortByMaxAge(changeList);
+            renderFriendsList(changeList);
             break;
         case "search-input-name":
-            allFriends.changeList = searchByName(allFriends.changeList, e.target.value);
-            renderFriendsList(allFriends.changeList);
+            changeList = searchByName(changeList, e.target.value);
+            renderFriendsList(changeList);
             break;
         case "search-input-age":
-            allFriends.changeList = filterByAge(allFriends.changeList, searchByAge1.value, searchByAge2.value);
-            renderFriendsList(allFriends.changeList);
+            changeList = filterByAge(changeList, searchByAge1.value, searchByAge2.value);
+            renderFriendsList(changeList);
             break;
         case "search-input-gender":
             if(e.target.value.toLowerCase().indexOf("male") !== -1) {
-                allFriends.changeList = filterByGender(allFriends.changeList, e.target.value);
-                renderFriendsList(allFriends.changeList);
+                changeList = filterByGender(changeList, e.target.value);
+                renderFriendsList(changeList);
             } else {
                 renderFriendsList(allFriends.currentList);
             }
