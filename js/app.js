@@ -19,7 +19,7 @@ const getDataApi = async () => {
 }      
 
 const drawFriendsCards = (user) => {
-    let temp = `<div class="user-card shadow-profile">
+    let temp = `<div class="user-card shadow-profile ${user.gender === "male" ? "shadow-profile__male" : "shadow-profile__female"}">
                     <div class="user-card__img">
                         <img src="${user.picture.large}" alt="My friend">
                     </div>
