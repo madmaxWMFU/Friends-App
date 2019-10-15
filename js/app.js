@@ -1,7 +1,7 @@
 const allFriends = {
     currentList: [],
     changeList: [],
-    countFriends: 52,
+    numberOfFriends: 52,
     minAge: 0,
     maxAge: 150
 };
@@ -11,12 +11,30 @@ const filters = document.querySelector(".filters-input");
 const sorts = document.querySelector(".search-sort-options");
 const resetFilters = document.querySelector(".reset-button");
 
-const getDataApi = async () => {
-    const response = await fetch(`https://randomuser.me/api/?results=${allFriends.countFriends}`);
-    const data = await response.json();
-    allFriends.currentList = data.results;
-    renderFriendsList(allFriends.currentList);
-}      
+const getData = async () => {
+    try {
+        const response = await fetch(`https://randomuser.me/api/?results=${allFriends.numberOfFriends}`);
+        const data = await response.json();
+        console.log(data.results)
+        return data.results;
+    } catch(err) {
+        alert(err);
+    }
+    
+    
+    
+}     
+
+    function handleErrors(response) {
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        return response;
+    }
+    fetch("http://httpstat.us/500")
+        .then(handleErrors)
+        .then(response => console.log("ok") )
+        .catch(error => console.log(error) );
 
 const drawFriendsCards = (user) => {
     let temp = `<div class="user-card shadow-profile ${user.gender === "male" ? "shadow-profile__male" : "shadow-profile__female"}">
@@ -39,9 +57,9 @@ const cleanFriendsZone = () => friendZone.innerHTML = "";
 const renderFriendsList = (allFriends) => allFriends.forEach(friend => drawFriendsCards(friend));
 
 const funcFilterList = {
-    filterByGender(list, {gender}) { return gender !== "all" ? list.filter((person) => person.gender === gender) : allFriends.currentList},
-    filterByAge(list, {ageTill, ageTo}) { return list.filter((person) => ageTill <= person.dob.age && person.dob.age <= ageTo)},
-    filterByName(list, {name}) { return name != "" ? list.filter((person) => new RegExp(name, 'i').test(person.name.first)) : null}
+    filterByGender: (list, {gender}) => gender !== "all" ? list.filter((person) => person.gender === gender) : allFriends.currentList,
+    filterByAge: (list, {ageTill, ageTo}) => list.filter((person) => ageTill <= person.dob.age && person.dob.age <= ageTo),
+    filterByName: (list, {name}) => name != "" ? list.filter((person) => new RegExp(name, 'i').test(person.name.first)) : null
 }
 
 const getFilterList = () => {
@@ -49,13 +67,12 @@ const getFilterList = () => {
     const searchValue = {
         name: document.querySelector(".search-input-name").value || "",
         gender: document.querySelector("[name='search-input-gender']:checked").value || "all",
-        ageTill: document.querySelector(".search-input-age1").value || allFriends.minAge,
-        ageTo: document.querySelector(".search-input-age2").value || allFriends.maxAge
+        ageTill: document.querySelector(".search-input-age-start").value || allFriends.minAge,
+        ageTo: document.querySelector(".search-input-age-end").value || allFriends.maxAge
     };
-    let funcName = ["filterByName", "filterByGender", "filterByAge"];
 
-    funcName.forEach((func) => {
-        let newArray = funcFilterList[func](allFriends.changeList, searchValue);
+    Object.keys(funcFilterList).forEach((func) => {
+        const newArray = funcFilterList[func](allFriends.changeList, searchValue);
         if(newArray != null) allFriends.changeList = newArray;
     });
 
@@ -91,10 +108,15 @@ const resetSearchValues = () => {
     renderFriendsList(allFriends.currentList);
 };
 
-filters.addEventListener("click", getSortList);
-sorts.addEventListener("change", getFilterList);
-resetFilters.addEventListener("click", resetSearchValues);
+const init = () => {
+    filters.addEventListener("click", getSortList);
+    sorts.addEventListener("change", getFilterList);
+    resetFilters.addEventListener("click", resetSearchValues);
+    allFriends.currentList = getData();
+    console.log(allFriends);
+    renderFriendsList(allFriends.currentList);
+}
 
 window.onload = function() {
-    getDataApi()
+    init();
 }
