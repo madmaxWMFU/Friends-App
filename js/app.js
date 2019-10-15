@@ -6,13 +6,9 @@ const allFriends = {
     maxAge: 150
 };
 
-const filters = document.querySelector(".filters-input");
-const searchByNameUser = document.querySelector(".search-input-name");
-const searchByGender = document.querySelector(".search-options__gender");
-const searchByAge1 = document.querySelector(".search-input-age1");
-const searchByAge2 = document.querySelector(".search-input-age2");
-const searchByAge = document.querySelector(".search-options__age");
 const friendZone = document.querySelector(".friends-zone");
+const filters = document.querySelector(".filters-input");
+const sorts = document.querySelector(".search-sort-options");
 const resetFilters = document.querySelector(".reset-button");
 
 const getDataApi = async () => {
@@ -24,74 +20,80 @@ const getDataApi = async () => {
 
 const drawFriendsCards = (user) => {
     let temp = `<div class="user-card shadow-profile">
-                    <div class="user-card__img"><img class="" src="${user.picture.large}"></div>
-                        <div class="user-card__cnt">
-                            <div class="profile-card__name"><span>${user.name.first}</span></div>
-                            <div class="profile-card__name"><span>${user.name.last}</span></div>
-                            <div class="profile-card__name"><span>${user.location.city}, ${user.nat}</span></div>
-                            <div class="profile-card__name"><address>Place: ${user.location.street.name}, ${user.location.street.number}</address></div>
-                        </div> 
+                    <div class="user-card__img">
+                        <img src="${user.picture.large}" alt="My friend">
+                    </div>
+                    <div class="user-card__cnt">
+                        <div class="profile-card__name"><span>${user.name.first}</span></div>
+                        <div class="profile-card__name"><span>${user.name.last}</span></div>
+                        <div class="profile-card__name"><span>${user.location.city}, ${user.nat}</span></div>
+                        <div class="profile-card__name"><address>Place: ${user.location.street.name}, ${user.location.street.number}</address></div>
+                    </div> 
                     <span class="user-card__age">${user.dob.age}</span>
                 </div>`;
     friendZone.insertAdjacentHTML("beforeEnd", temp);
 }
 
-const renderFriendsList = (allFriends) => {
-    friendZone.innerHTML = "";
-    allFriends.forEach(friend => drawFriendsCards(friend));
+const cleanFriendsZone = () => friendZone.innerHTML = "";
+
+const renderFriendsList = (allFriends) => allFriends.forEach(friend => drawFriendsCards(friend));
+
+const funcFilterList = {
+    filterByGender(list, {gender}) { return gender !== "all" ? list.filter((person) => person.gender === gender) : allFriends.currentList},
+    filterByAge(list, {ageTill, ageTo}) { return list.filter((person) => ageTill <= person.dob.age && person.dob.age <= ageTo)},
+    filterByName(list, {name}) { return name != "" ? list.filter((person) => new RegExp(name, 'i').test(person.name.first)) : null}
 }
 
-const sortByMinAge = (arr) => arr.sort((a, b) => a.dob.age - b.dob.age);
+const getFilterList = () => {
+    allFriends.changeList = [...allFriends.currentList];
+    const searchValue = {
+        name: document.querySelector(".search-input-name").value || "",
+        gender: document.querySelector("[name='search-input-gender']:checked").value || "all",
+        ageTill: document.querySelector(".search-input-age1").value || allFriends.minAge,
+        ageTo: document.querySelector(".search-input-age2").value || allFriends.maxAge
+    };
+    let funcName = ["filterByName", "filterByGender", "filterByAge"];
 
-const sortByMaxAge = (arr) => arr.sort((a, b) => b.dob.age - a.dob.age);
+    funcName.forEach((func) => {
+        let newArray = funcFilterList[func](allFriends.changeList, searchValue);
+        if(newArray != null) allFriends.changeList = newArray;
+    });
 
-const sortByAscName = (arr) => arr.sort((a, b) => a.name.first < b.name.first ? -1 : 1);
+    cleanFriendsZone();
+    renderFriendsList(allFriends.changeList);  
+}
 
-const sortByDescName = (arr) => arr.sort((a, b) => a.name.first > b.name.first ? -1 : 1);
-
-const filterByGender = (arr, gender) => arr.filter((arr) => arr.gender === gender);
-
-const filterByAge = (arr, age1, age2) => arr.filter((arr) => age1 <= arr.dob.age && arr.dob.age <= age2);
-
-const searchByName = (arr, searchText) => arr.filter((arr) => new RegExp(searchText, 'i').test(arr.name.first));
-
-resetFilters.addEventListener("click", () => {
-    searchByNameUser.value = "";
-    filters.options[0].selected = true;
-    searchByAge1.value = allFriends.minAge;
-    searchByAge2.value = allFriends.maxAge;
-    document.querySelector("[name='search-input-gender']:checked").checked = false;
-    renderFriendsList(allFriends.currentList);
-});
-
-document.querySelector(".search-wrap-options").addEventListener("change", (e) => {
-    changeList = [...allFriends.currentList];
-    switch(e.target.name) {
-        case "search-input-options":
-            if(e.target.value === "nameAsc") changeList = sortByAscName(changeList);
-            if(e.target.value === "nameDesc") changeList = sortByDescName(changeList);
-            if(e.target.value === "ageAsc") changeList = sortByMinAge(changeList);
-            if(e.target.value === "ageDesc") changeList = sortByMaxAge(changeList);
-            renderFriendsList(changeList);
+const getSortList = ({target}) => {
+    switch(target.value) {
+        case "nameAsc":
+            allFriends.changeList = allFriends.changeList.sort((a, b) => a.name.first < b.name.first ? -1 : 1);
             break;
-        case "search-input-name":
-            changeList = searchByName(changeList, e.target.value);
-            renderFriendsList(changeList);
+        case "nameDesc":
+            allFriends.changeList = allFriends.changeList.sort((a, b) => a.name.first > b.name.first ? -1 : 1);
             break;
-        case "search-input-age":
-            changeList = filterByAge(changeList, searchByAge1.value, searchByAge2.value);
-            renderFriendsList(changeList);
+        case "ageAsc":
+            allFriends.changeList = allFriends.changeList.sort((a, b) => a.dob.age - b.dob.age);
             break;
-        case "search-input-gender":
-            if(e.target.value.toLowerCase().indexOf("male") !== -1) {
-                changeList = filterByGender(changeList, e.target.value);
-                renderFriendsList(changeList);
-            } else {
-                renderFriendsList(allFriends.currentList);
-            }
+        case "ageDesc":
+            allFriends.changeList = allFriends.changeList.sort((a, b) => b.dob.age - a.dob.age);
             break;
     }
-})
+    cleanFriendsZone();
+    renderFriendsList(allFriends.changeList);
+};
+
+const resetSearchValues = () => {
+    filters.options[0].selected = true;
+    document.querySelector(".search-input-name").value = "";
+    document.querySelector(".search-input-age1").value = allFriends.minAge;
+    document.querySelector(".search-input-age2").value = allFriends.maxAge;
+    document.querySelectorAll("[name='search-input-gender']")[2].checked = true;
+    renderFriendsList(allFriends.currentList);
+};
+
+filters.addEventListener("click", getSortList);
+sorts.addEventListener("change", getFilterList);
+resetFilters.addEventListener("click", resetSearchValues);
 
 window.onload = function() {
     getDataApi()
