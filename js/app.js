@@ -56,7 +56,7 @@ const cleanFriendsZone = () => friendZone.innerHTML = "";
 
 const renderFriendsList = (allFriends) => allFriends.forEach(friend => drawFriendsCards(friend));
 
-const funcFilterList = {
+const functionFilterList = {
     filterByGender: (list, {gender}) => gender !== "all" ? list.filter((person) => person.gender === gender) : allFriends.currentList,
     filterByAge: (list, {ageTill, ageTo}) => list.filter((person) => ageTill <= person.dob.age && person.dob.age <= ageTo),
     filterByName: (list, {name}) => name != "" ? list.filter((person) => new RegExp(name, 'i').test(person.name.first)) : null
@@ -71,8 +71,8 @@ const getFilterList = () => {
         ageTo: document.querySelector(".search-input-age-end").value || allFriends.maxAge
     };
 
-    Object.keys(funcFilterList).forEach((func) => {
-        const newArray = funcFilterList[func](allFriends.changeList, searchValue);
+    Object.keys(functionFilterList).forEach((filter) => {
+        const newArray = functionFilterList[filter](allFriends.changeList, searchValue);
         if(newArray != null) allFriends.changeList = newArray;
     });
 
@@ -100,11 +100,11 @@ const getSortList = ({target}) => {
 };
 
 const resetSearchValues = () => {
-    filters.options[0].selected = true;
+    filters.value = "none";
     document.querySelector(".search-input-name").value = "";
     document.querySelector(".search-input-age1").value = allFriends.minAge;
     document.querySelector(".search-input-age2").value = allFriends.maxAge;
-    document.querySelectorAll("[name='search-input-gender']")[2].checked = true;
+    document.querySelector("[name='search-input-gender'][value='all']").checked = true;
     renderFriendsList(allFriends.currentList);
 };
 
