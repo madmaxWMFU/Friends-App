@@ -98,6 +98,7 @@ const resetSearchValues = () => {
 const init = async () => {
     try {
         allFriends.currentList = await loadJson();
+        allFriends.changeList = [...allFriends.currentList];
         sorts.addEventListener("click", getSortList);
         filters.addEventListener("change", getFilterList);
         resetFilters.addEventListener("click", resetSearchValues);
