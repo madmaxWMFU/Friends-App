@@ -7,34 +7,18 @@ const allFriends = {
 };
 
 const friendZone = document.querySelector(".friends-zone");
-const filters = document.querySelector(".filters-input");
-const sorts = document.querySelector(".search-sort-options");
+const sorts = document.querySelector(".sort-input");
+const filters = document.querySelector(".search-filter-options");
 const resetFilters = document.querySelector(".reset-button");
 
-const getData = async () => {
-    try {
-        const response = await fetch(`https://randomuser.me/api/?results=${allFriends.numberOfFriends}`);
-        const data = await response.json();
-        console.log(data.results)
-        return data.results;
-    } catch(err) {
-        alert(err);
-    }
-    
-    
-    
-}     
-
-    function handleErrors(response) {
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        return response;
-    }
-    fetch("http://httpstat.us/500")
-        .then(handleErrors)
-        .then(response => console.log("ok") )
-        .catch(error => console.log(error) );
+const loadJson = () => {
+    return fetch(`https://randomuser.me/api/?results=${allFriends.numberOfFriends}`)
+    .then(response => {
+        if (response.ok) return response.json();
+            throw new Error(response.status);
+    })
+    .then(data => data.results);
+}    
 
 const drawFriendsCards = (user) => {
     let temp = `<div class="user-card shadow-profile ${user.gender === "male" ? "shadow-profile__male" : "shadow-profile__female"}">
@@ -54,6 +38,8 @@ const drawFriendsCards = (user) => {
 
 const cleanFriendsZone = () => friendZone.innerHTML = "";
 
+const errorMessage = () => friendZone.insertAdjacentHTML("beforeEnd", '<h4 class="friends-zone__error">No internet connection. Please try again!)</h4>');
+
 const renderFriendsList = (allFriends) => allFriends.forEach(friend => drawFriendsCards(friend));
 
 const functionFilterList = {
@@ -63,6 +49,7 @@ const functionFilterList = {
 }
 
 const getFilterList = () => {
+    sorts.value = "none";
     allFriends.changeList = [...allFriends.currentList];
     const searchValue = {
         name: document.querySelector(".search-input-name").value || "",
@@ -97,24 +84,28 @@ const getSortList = ({target}) => {
     }
     cleanFriendsZone();
     renderFriendsList(allFriends.changeList);
-};
+}
 
 const resetSearchValues = () => {
-    filters.value = "none";
+    sorts.value = "none";
     document.querySelector(".search-input-name").value = "";
     document.querySelector(".search-input-age1").value = allFriends.minAge;
     document.querySelector(".search-input-age2").value = allFriends.maxAge;
     document.querySelector("[name='search-input-gender'][value='all']").checked = true;
     renderFriendsList(allFriends.currentList);
-};
+}
 
-const init = () => {
-    filters.addEventListener("click", getSortList);
-    sorts.addEventListener("change", getFilterList);
+const init = async () => {
+    sorts.addEventListener("click", getSortList);
+    filters.addEventListener("change", getFilterList);
     resetFilters.addEventListener("click", resetSearchValues);
-    allFriends.currentList = getData();
-    console.log(allFriends);
-    renderFriendsList(allFriends.currentList);
+    cleanFriendsZone();
+    try {
+        allFriends.currentList = await loadJson();
+        renderFriendsList(allFriends.currentList);
+    } catch {
+        errorMessage();
+    }
 }
 
 window.onload = function() {
