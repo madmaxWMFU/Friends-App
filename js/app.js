@@ -96,12 +96,12 @@ const resetSearchValues = () => {
 }
 
 const init = async () => {
-    sorts.addEventListener("click", getSortList);
-    filters.addEventListener("change", getFilterList);
-    resetFilters.addEventListener("click", resetSearchValues);
-    cleanFriendsZone();
     try {
         allFriends.currentList = await loadJson();
+        sorts.addEventListener("click", getSortList);
+        filters.addEventListener("change", getFilterList);
+        resetFilters.addEventListener("click", resetSearchValues);
+        cleanFriendsZone();
         renderFriendsList(allFriends.currentList);
     } catch {
         errorMessage();
