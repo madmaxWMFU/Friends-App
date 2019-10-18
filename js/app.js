@@ -101,7 +101,7 @@ const resetSearchValues = () => {
 const init = async () => {
     try {
         allFriends.currentList = await loadFriends();
-        allFriends.changeList = [...allFriends.currentList]; 
+        allFriends.changeList = [...allFriends.currentList];
         sorts.addEventListener("click", getSortList);
         filters.addEventListener("change", getFilterList);
         resetFilters.addEventListener("click", resetSearchValues);
