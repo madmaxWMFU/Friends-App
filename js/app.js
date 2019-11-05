@@ -19,6 +19,7 @@ const filters = document.querySelector(".search-filter-options");
 const resetFilters = document.querySelector(".reset-button");
 const searchName = document.querySelector(".search-input-name");
 const searchGender = Array.from(document.querySelectorAll("[name='search-input-gender']"));
+const allGender = document.querySelector('#all');
 const searchAgeTill = document.querySelector(".search-input-age-start");
 const searchAgeTo = document.querySelector(".search-input-age-end");
 
@@ -53,7 +54,7 @@ const showErrorMessage = () => friendZone.insertAdjacentHTML("beforeEnd", '<h4 c
 
 const renderFriendsList = (allFriends) => allFriends.forEach(drawFriendsCards);
 
-const getFilterList = {
+const listOfFilters = {
     filterByGender: (list, {gender}) => {
         if(gender !== "all") {
           return list.filter((person) => person.gender === gender); 
@@ -62,10 +63,10 @@ const getFilterList = {
         }
     },
     filterByAge: (list, {ageTill, ageTo}) => {
-        return list.filter((person) => ageTill <= person.dob.age && person.dob.age <= ageTo);
+        return list.filter(({dob}) => ageTill <= dob.age && dob.age <= ageTo);
     },
     filterByName: (list, {name}) => {
-        if(name != "") {
+        if(name) {
             return list.filter((person) => person.name.first.toLowerCase().includes(name));
         } else {
             return allFriends.changeList;
@@ -76,8 +77,8 @@ const getFilterList = {
 const getGenderValue = () => searchGender.find(item => item.checked === true).value;
 
 const applyFilters = () => {
-    Object.keys(getFilterList).forEach((filter) => {
-        allFriends.changeList = getFilterList[filter](allFriends.changeList, searchValues);
+    Object.keys(listOfFilters).forEach((filter) => {
+        allFriends.changeList = listOfFilters[filter](allFriends.changeList, searchValues);
     });
 }
 
@@ -119,10 +120,11 @@ const getSortByAgeList = (option) => {
 }
 
 const renderSortFriendList = ({target}) => {
-    if(target.value != "none")
+    if(target.value != "none") {
         allFriends.changeList = target.value.includes("name") ? getSortByNameList(target.value) : getSortByAgeList(target.value);
         cleanFriendsZone();
         renderFriendsList(allFriends.changeList);
+    }
 }
 
 const resetSearchValues = () => {
@@ -130,7 +132,7 @@ const resetSearchValues = () => {
     searchName.value = "";
     searchAgeTill.value = allFriends.minAge;
     searchAgeTo.value = allFriends.maxAge;
-    searchGender.find(item => item.value === "all").checked = true;
+    allGender.checked = true;
     renderFriendsList(allFriends.currentList);
 }
 
