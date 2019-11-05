@@ -133,6 +133,7 @@ const resetSearchValues = () => {
     searchAgeTill.value = allFriends.minAge;
     searchAgeTo.value = allFriends.maxAge;
     allGender.checked = true;
+    cleanFriendsZone();
     renderFriendsList(allFriends.currentList);
 }
 
